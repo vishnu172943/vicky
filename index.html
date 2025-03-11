@@ -1,311 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Chat with Vicky</title> <link rel="icon" href="data:,">
-<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  body {
-    font-family: 'Comic Neue', cursive;
-    margin: 0;
-    padding: 0;
-    background-color: #f9f4ff;
-    color: #333;
-    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="5" fill="%23FFDE7D" opacity="0.3"/><circle cx="60" cy="40" r="4" fill="%23FF9AA2" opacity="0.3"/><circle cx="80" cy="70" r="6" fill="%23B5EAD7" opacity="0.3"/><circle cx="40" cy="80" r="4" fill="%23C7CEEA" opacity="0.3"/></svg>');
-  }
-
-  .chat-container {
-    max-width: 700px;
-    margin: 30px auto;
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 24px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    height: 85vh;
-    border: 4px solid #ffde7d;
-  }
-
-  .chat-header {
-    background: linear-gradient(to right, #FF9AA2, #FFDE7D, #B5EAD7, #C7CEEA);
-    color: #5f3dc4;
-    text-align: center;
-    padding: 20px 0;
-    font-size: 1.8em;
-    font-weight: bold;
-    border-bottom: 4px solid #ffde7d;
-    text-shadow: 2px 2px 0px rgba(255,255,255,0.5);
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .chat-header:before {
-    content: "👋";
-    font-size: 1.5em;
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  
-  .chat-header:after {
-    content: "🎮";
-    font-size: 1.5em;
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
-  .chat-display {
-    flex-grow: 1;
-    padding: 20px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M30,20 Q40,5 50,20 T70,20" stroke="%23FFDE7D" fill="none" opacity="0.2"/><path d="M20,50 Q40,35 60,50 T80,50" stroke="%23FF9AA2" fill="none" opacity="0.2"/><path d="M30,80 Q40,65 50,80 T70,80" stroke="%23B5EAD7" fill="none" opacity="0.2"/></svg>');
-  }
-
-  .message {
-    padding: 14px 20px;
-    border-radius: 20px;
-    margin-bottom: 16px;
-    max-width: 80%;
-    clear: both;
-    font-size: 1.1em;
-    line-height: 1.4;
-    position: relative;
-    transform-origin: center left;
-    animation: popIn 0.3s ease-out forwards;
-  }
-  
-  @keyframes popIn {
-    0% { transform: scale(0.8); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  .user-message {
-    background-color: #c7ceea;
-    color: #333;
-    align-self: flex-end;
-    border-radius: 20px 20px 4px 20px;
-    box-shadow: 2px 2px 10px rgba(199, 206, 234, 0.5);
-    border: 2px solid #a9b2e0;
-  }
-  
-  .user-message:after {
-    content: "👧";
-    position: absolute;
-    bottom: -20px;
-    right: 5px;
-    font-size: 1.2em;
-  }
-
-  .llm-message {
-    background-color: #ffde7d;
-    color: #333;
-    align-self: flex-start;
-    border-radius: 20px 20px 20px 4px;
-    box-shadow: 2px 2px 10px rgba(255, 222, 125, 0.5);
-    border: 2px solid #ebc94d;
-  }
-  
-  .llm-message:after {
-    content: "🤖";
-    position: absolute;
-    bottom: -20px;
-    left: 5px;
-    font-size: 1.2em;
-  }
-  
-  .llm-message ul {
-    margin: 5px 0;
-    padding-left: 20px;
-  }
-  
-  .llm-message li {
-    margin-bottom: 5px;
-  }
-  
-  .follow-up-container {
-    align-self: flex-start;
-    margin-top: 5px;
-    margin-bottom: 20px;
-    max-width: 80%;
-    padding-left: 30px;
-  }
-  
-  .follow-up-questions-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .follow-up-questions-list li {
-    background-color: #b5ead7;
-    padding: 10px 18px;
-    margin-bottom: 10px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1em;
-    display: flex;
-    align-items: center;
-    border: 2px solid #8ddbbb;
-    box-shadow: 0 4px 8px rgba(181, 234, 215, 0.4);
-    transform-origin: left center;
-  }
-  
-  .follow-up-questions-list li:hover {
-    background-color: #8ddbbb;
-    transform: scale(1.05);
-    box-shadow: 0 6px 12px rgba(141, 219, 187, 0.6);
-  }
-  
-  .follow-up-icon {
-    margin-right: 10px;
-    font-size: 1.4em;
-  }
-
-  .input-area { 
-    padding: 20px; 
-    background-color: #fff; 
-    border-top: 4px solid #ffde7d; 
-    display: flex; 
-    align-items: center; 
-    position: relative;
-  }
-  
-  #message-input { 
-    flex-grow: 1; 
-    padding: 15px 20px; 
-    border-radius: 25px; 
-    border: 3px solid #c7ceea; 
-    margin-right: 15px; 
-    font-size: 1.1em; 
-    font-family: 'Comic Neue', cursive;
-    background-color: #f9f9f9;
-    transition: all 0.3s ease;
-  }
-  
-  #message-input:focus {
-    outline: none;
-    border-color: #ff9aa2;
-    box-shadow: 0 0 15px rgba(255, 154, 162, 0.3);
-  }
-  
-  #send-button { 
-    padding: 15px 30px; 
-    border: none; 
-    border-radius: 25px; 
-    background: linear-gradient(45deg, #ff9aa2, #ffb7b2); 
-    color: white; 
-    cursor: pointer; 
-    font-size: 1.1em; 
-    font-weight: bold;
-    font-family: 'Comic Neue', cursive;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(255, 154, 162, 0.4);
-    position: relative;
-    overflow: hidden;
-  }
-  
-  #send-button:hover { 
-    background: linear-gradient(45deg, #ff8a92, #ffa7a2);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(255, 154, 162, 0.5);
-  }
-  
-  #send-button:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 5px rgba(255, 154, 162, 0.5);
-  }
-  
-  #send-button:after {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: rgba(255,255,255,0.2);
-    transform: rotate(45deg);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  #send-button:hover:after {
-    opacity: 1;
-  }
-  
-  .error-message { 
-    color: #ff6b6b; 
-    margin-top: 15px; 
-    font-style: italic; 
-    background-color: #ffeaea;
-    padding: 10px 15px;
-    border-radius: 15px;
-    border: 2px dashed #ffb7b2;
-  }
-  
-  .system-message { 
-    background-color: #ffd8be; 
-    color: #854f23; 
-    border: 2px solid #ffc29e; 
-    align-self: center; 
-    text-align: center; 
-    max-width: 90%;
-    font-size: 1.2em;
-    box-shadow: 0 4px 10px rgba(255, 216, 190, 0.5);
-    animation: bounce 0.5s ease;
-  }
-  
-  @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-    40% {transform: translateY(-20px);}
-    60% {transform: translateY(-10px);}
-  }
-  
-  /* Style for scrollbar */
-  .chat-display::-webkit-scrollbar {
-    width: 12px;
-  }
-  
-  .chat-display::-webkit-scrollbar-track {
-    background: #f9f4ff;
-    border-radius: 10px;
-  }
-  
-  .chat-display::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, #ffde7d, #ff9aa2);
-    border-radius: 10px;
-    border: 3px solid #f9f4ff;
-  }
-  
-  .chat-display::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to bottom, #ebc94d, #ff8a92);
-  }
-</style>
-</head>
-<body>
-
-<div class="chat-container">
-  <div class="chat-header">Chat with Vicky</div>
-  <div class="chat-display" id="chat-display">
-    <div class="llm-message system-message">Hello there! I'm Vicky! 🌟 Ask me anything and let's have a fun chat together! ✨</div>
-  </div>
-  <div class="input-area">
-    <input type="text" id="message-input" placeholder="Type your question here...">
-    <button id="send-button">Send 🚀</button>
-  </div>
-</div>
-
 <script>
   const apiKey = 'AIzaSyAPuyc1O1jKBi0KawKmi_jeExdwiHq7PXU'; // **IMPORTANT: Keep API keys secure in real applications!**
   const modelName = 'gemini-2.0-flash';
   const chatDisplay = document.getElementById('chat-display');
   const messageInput = document.getElementById('message-input');
   const sendButton = document.getElementById('send-button');
+
+  const followUpPopup = document.getElementById('followUpPopup');
+  const followUpQuestionList = document.getElementById('followUpQuestionList');
+  const popupCloseBtn = document.getElementById('popupCloseBtn');
+
+  let conversationHistory = []; // Array to store conversation history
 
   sendButton.addEventListener('click', sendMessage);
   messageInput.addEventListener('keydown', (event) => {
@@ -315,19 +19,47 @@
     }
   });
 
+  popupCloseBtn.onclick = function() {
+    followUpPopup.style.display = "none"; // Close popup when close button is clicked
+  }
+
+  window.onclick = function(event) {
+    if (event.target == followUpPopup) {
+      followUpPopup.style.display = "none"; // Close popup if clicked outside the content
+    }
+  }
+
+
   async function sendMessage() {
     const userMessageText = messageInput.value.trim();
     if (!userMessageText) return;
 
     displayUserMessage(userMessageText);
+
+    // Add user message to conversation history
+    conversationHistory.push({ role: 'user', parts: [{ text: userMessageText }] });
+    if (conversationHistory.length > 10) { // Keep only last 10 turns (pairs of user/assistant messages)
+      conversationHistory = conversationHistory.slice(-10);
+    }
+
     messageInput.value = '';
 
     try {
-      const llmResponseText = await getLLMResponse(userMessageText);
+      const llmResponseText = await getLLMResponse(conversationHistory); // Pass history to getLLMResponse
       displayLLMMessage(llmResponseText);
+
+      // Add LLM response to conversation history
+      const llmResponseContent = { role: 'model', parts: [{ text: llmResponseText }] };
+      conversationHistory.push(llmResponseContent);
+      if (conversationHistory.length > 10) { // Keep history size limited
+        conversationHistory = conversationHistory.slice(-10);
+      }
+
     } catch (error) {
-      displayErrorMessage("Oops! I couldn't answer that right now. Try asking something else!");
+      displayErrorMessage("Error communicating with Vicky. Please try again later.");
       console.error("Error fetching LLM response:", error);
+    } finally {
+      // Optional loading state handling
     }
   }
 
@@ -340,74 +72,42 @@
   }
 
   function displayLLMMessage(text) {
-    // Split the main response from follow-up questions
-    const separator = "***\n\nFollow-up Questions:\n***";
-    const parts = text.split(separator);
-    const mainResponse = parts[0].trim();
-    const suggestionText = parts.length > 1 ? parts[1] : null;
-
-    // Display main response
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', 'llm-message');
-    
-    // Convert the response to HTML to preserve formatting
-    let formattedResponse = mainResponse
-      // Convert bullet points (* and -) to HTML list items
-      .replace(/^\s*[\*\-]\s+(.+)$/gm, '<li>$1</li>')
-      // Wrap list items in <ul> tags if they exist
-      .replace(/(<li>.+<\/li>)+/g, '<ul>$&</ul>')
-      // Convert numbering (1. 2. etc) to HTML list items
-      .replace(/^\s*(\d+)\.\s+(.+)$/gm, '<li>$2</li>')
-      // Wrap numbered list items in <ol> tags if they exist
-      .replace(/(<li>.+<\/li>)+/g, '<ul>$&</ul>')
-      // Convert line breaks to <br> tags
-      .replace(/\n/g, '<br>');
-    
-    messageDiv.innerHTML = formattedResponse;
+    messageDiv.innerHTML = text;
     chatDisplay.appendChild(messageDiv);
+    scrollToBottom();
 
-    // If there are follow-up questions, display them below the response
+    // **Check if it's a system message - if so, don't show pop-up**
+    if (messageDiv.classList.contains('system-message')) {
+      return; // Exit the function early, don't process pop-up
+    }
+
+    // **Parse Follow-up Questions & Display in Popup (only for non-system messages)**
+    const separator = "***\n\nFollow-up Questions:\n***";
+    const parts = text.split(separator);
+    const suggestionText = parts.length > 1 ? parts[1] : null;
+
     if (suggestionText) {
       const followUpQuestions = suggestionText.trim().split('\n')
                                           .map(q => q.replace(/^\d+\.\s*Follow-up Question:\s*/, '').trim())
                                           .filter(q => q);
 
       if (followUpQuestions.length > 0) {
-        const followUpContainer = document.createElement('div');
-        followUpContainer.classList.add('follow-up-container');
-        
-        const followUpList = document.createElement('ul');
-        followUpList.classList.add('follow-up-questions-list');
-        
+        followUpQuestionList.innerHTML = ''; // Clear previous questions
         followUpQuestions.forEach(question => {
           const listItem = document.createElement('li');
-          
-          // Add fun question icon (random selection)
-          const icons = ['🙋', '🤔', '💭', '❓', '🎮', '🎯', '🎨', '🌈'];
-          const randomIcon = icons[Math.floor(Math.random() * icons.length)];
-          
-          const icon = document.createElement('span');
-          icon.classList.add('follow-up-icon');
-          icon.innerHTML = randomIcon;
-          listItem.appendChild(icon);
-          
-          const questionText = document.createTextNode(question);
-          listItem.appendChild(questionText);
-          
+          listItem.textContent = question;
           listItem.addEventListener('click', () => {
             messageInput.value = question;
             sendMessage();
+            followUpPopup.style.display = "none"; // Close popup after question selected
           });
-          
-          followUpList.appendChild(listItem);
+          followUpQuestionList.appendChild(listItem);
         });
-        
-        followUpContainer.appendChild(followUpList);
-        chatDisplay.appendChild(followUpContainer);
+        followUpPopup.style.display = "block"; // Show the popup
       }
     }
-    
-    scrollToBottom();
   }
 
   function displayErrorMessage(message) {
@@ -418,35 +118,12 @@
     scrollToBottom();
   }
 
-  async function getLLMResponse(prompt) {
+  async function getLLMResponse(history) { // Now accepts 'history' as argument
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
-    // Updated system prompt with kid-friendly and point-form instructions
-    const systemPrompt = `You are Vicky, a friendly, fun, and kid-friendly AI assistant. Follow these principles in every response:
-
-1. For longer responses, use bullet points (•) or numbered lists instead of paragraphs
-2. Keep your language simple and easy to understand, like talking to a child
-3. Add fun emojis and symbols to make your responses more engaging ✨🌟🎮
-4. Use bright, positive language and a friendly tone
-5. Keep explanations short and clear
-6. Be supportive and encouraging in every response
-7. Use examples that kids would understand and relate to
-8. For complex topics, break them down into simple points
-9. Always be enthusiastic and playful in your responses
-
-After your response, generate 2-3 fun follow-up questions using exactly this format:
-"***\n\nFollow-up Questions:\n***
-1. Follow-up Question: [question 1]
-2. Follow-up Question: [question 2]
-3. Follow-up Question: [question 3]"
-
-Now, here is the user's request: "${prompt}"
-`;
-
+    // **Include Conversation History in API Request**
     const requestBody = {
-      contents: [{
-        parts: [{ text: systemPrompt }]
-      }]
+      contents: history // Send the conversation history directly in 'contents'
     };
 
     const response = await fetch(apiUrl, {
@@ -478,6 +155,3 @@ Now, here is the user's request: "${prompt}"
     chatDisplay.scrollTop = chatDisplay.scrollHeight;
   }
 </script>
-
-</body>
-</html>
