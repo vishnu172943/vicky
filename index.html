@@ -1,15 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Chat with Vicky</title> <link rel="icon" href="data:,">
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    color: #333;
+  }
+
+  .chat-container {
+    max-width: 700px;
+    margin: 30px auto;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 85vh;
+    border: 1px solid #eee;
+  }
+
+  .chat-header {
+    background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff);
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 1.2em;
+    border-bottom: 2px solid #ddd;
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+  }
+
+  .chat-display {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .message {
+    padding: 12px 20px;
+    border-radius: 25px;
+    margin-bottom: 12px;
+    max-width: 80%;
+    clear: both;
+  }
+
+  .user-message {
+    background-color: #90caf9;
+    color: #222;
+    align-self: flex-end;
+  }
+
+  .llm-message {
+    background-color: #ffe0b2;
+    color: #222;
+    align-self: flex-start;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+  }
+  
+  .follow-up-container {
+    align-self: flex-start;
+    margin-top: -5px;
+    margin-bottom: 15px;
+    max-width: 80%;
+    padding-left: 20px;
+  }
+  
+  .follow-up-questions-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .follow-up-questions-list li {
+    background-color: #e1f5fe;
+    padding: 8px 15px;
+    margin-bottom: 8px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+  }
+  
+  .follow-up-questions-list li:hover {
+    background-color: #b3e5fc;
+  }
+  
+  .follow-up-icon {
+    margin-right: 8px;
+    color: #0288d1;
+  }
+
+  .input-area { padding: 15px; background-color: #f0f0f0; border-top: 1px solid #ddd; display: flex; align-items: center; }
+  #message-input { flex-grow: 1; padding: 12px 15px; border-radius: 25px; border: 1px solid #ccc; margin-right: 10px; font-size: 1em; }
+  #send-button { padding: 12px 25px; border: none; border-radius: 25px; background-color: #007bff; color: white; cursor: pointer; font-size: 1em; transition: background-color 0.3s ease; }
+  #send-button:hover { background-color: #0056b3; }
+  .error-message { color: red; margin-top: 10px; font-style: italic; }
+  .system-message { background-color: #ffe0b2; color: #85640a; border: 1px solid #ffcc80; align-self: center; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">Chat with Vicky</div>
+  <div class="chat-display" id="chat-display">
+    <div class="llm-message system-message">Hello! I'm Vicky. Ask me anything! I'll give you some follow-up questions to keep our chat going!</div>
+  </div>
+  <div class="input-area">
+    <input type="text" id="message-input" placeholder="Type your message here...">
+    <button id="send-button">Send</button>
+  </div>
+</div>
+
 <script>
   const apiKey = 'AIzaSyAPuyc1O1jKBi0KawKmi_jeExdwiHq7PXU'; // **IMPORTANT: Keep API keys secure in real applications!**
   const modelName = 'gemini-2.0-flash';
   const chatDisplay = document.getElementById('chat-display');
   const messageInput = document.getElementById('message-input');
   const sendButton = document.getElementById('send-button');
-
-  const followUpPopup = document.getElementById('followUpPopup');
-  const followUpQuestionList = document.getElementById('followUpQuestionList');
-  const popupCloseBtn = document.getElementById('popupCloseBtn');
-
-  let conversationHistory = []; // Array to store conversation history
 
   sendButton.addEventListener('click', sendMessage);
   messageInput.addEventListener('keydown', (event) => {
@@ -19,47 +134,19 @@
     }
   });
 
-  popupCloseBtn.onclick = function() {
-    followUpPopup.style.display = "none"; // Close popup when close button is clicked
-  }
-
-  window.onclick = function(event) {
-    if (event.target == followUpPopup) {
-      followUpPopup.style.display = "none"; // Close popup if clicked outside the content
-    }
-  }
-
-
   async function sendMessage() {
     const userMessageText = messageInput.value.trim();
     if (!userMessageText) return;
 
     displayUserMessage(userMessageText);
-
-    // Add user message to conversation history
-    conversationHistory.push({ role: 'user', parts: [{ text: userMessageText }] });
-    if (conversationHistory.length > 10) { // Keep only last 10 turns (pairs of user/assistant messages)
-      conversationHistory = conversationHistory.slice(-10);
-    }
-
     messageInput.value = '';
 
     try {
-      const llmResponseText = await getLLMResponse(conversationHistory); // Pass history to getLLMResponse
+      const llmResponseText = await getLLMResponse(userMessageText);
       displayLLMMessage(llmResponseText);
-
-      // Add LLM response to conversation history
-      const llmResponseContent = { role: 'model', parts: [{ text: llmResponseText }] };
-      conversationHistory.push(llmResponseContent);
-      if (conversationHistory.length > 10) { // Keep history size limited
-        conversationHistory = conversationHistory.slice(-10);
-      }
-
     } catch (error) {
       displayErrorMessage("Error communicating with Vicky. Please try again later.");
       console.error("Error fetching LLM response:", error);
-    } finally {
-      // Optional loading state handling
     }
   }
 
@@ -72,42 +159,57 @@
   }
 
   function displayLLMMessage(text) {
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message', 'llm-message');
-    messageDiv.innerHTML = text;
-    chatDisplay.appendChild(messageDiv);
-    scrollToBottom();
-
-    // **Check if it's a system message - if so, don't show pop-up**
-    if (messageDiv.classList.contains('system-message')) {
-      return; // Exit the function early, don't process pop-up
-    }
-
-    // **Parse Follow-up Questions & Display in Popup (only for non-system messages)**
+    // Split the main response from follow-up questions
     const separator = "***\n\nFollow-up Questions:\n***";
     const parts = text.split(separator);
+    const mainResponse = parts[0].trim();
     const suggestionText = parts.length > 1 ? parts[1] : null;
 
+    // Display main response
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', 'llm-message');
+    messageDiv.textContent = mainResponse;
+    chatDisplay.appendChild(messageDiv);
+
+    // If there are follow-up questions, display them below the response
     if (suggestionText) {
       const followUpQuestions = suggestionText.trim().split('\n')
                                           .map(q => q.replace(/^\d+\.\s*Follow-up Question:\s*/, '').trim())
                                           .filter(q => q);
 
       if (followUpQuestions.length > 0) {
-        followUpQuestionList.innerHTML = ''; // Clear previous questions
+        const followUpContainer = document.createElement('div');
+        followUpContainer.classList.add('follow-up-container');
+        
+        const followUpList = document.createElement('ul');
+        followUpList.classList.add('follow-up-questions-list');
+        
         followUpQuestions.forEach(question => {
           const listItem = document.createElement('li');
-          listItem.textContent = question;
+          
+          // Add question icon
+          const icon = document.createElement('span');
+          icon.classList.add('follow-up-icon');
+          icon.innerHTML = '❓';
+          listItem.appendChild(icon);
+          
+          const questionText = document.createTextNode(question);
+          listItem.appendChild(questionText);
+          
           listItem.addEventListener('click', () => {
             messageInput.value = question;
             sendMessage();
-            followUpPopup.style.display = "none"; // Close popup after question selected
           });
-          followUpQuestionList.appendChild(listItem);
+          
+          followUpList.appendChild(listItem);
         });
-        followUpPopup.style.display = "block"; // Show the popup
+        
+        followUpContainer.appendChild(followUpList);
+        chatDisplay.appendChild(followUpContainer);
       }
     }
+    
+    scrollToBottom();
   }
 
   function displayErrorMessage(message) {
@@ -118,12 +220,38 @@
     scrollToBottom();
   }
 
-  async function getLLMResponse(history) { // Now accepts 'history' as argument
+  async function getLLMResponse(prompt) {
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
-    // **Include Conversation History in API Request**
+    // Updated system prompt with the user's conversation principles
+    const systemPrompt = `You are Vicky, a thoughtful, natural, and engaging AI assistant. Follow these principles in every response:
+
+1. Understand deeply: Focus on what the user asks and why.
+2. Match tone: Reflect the user's vibe — casual, serious, fun, or deep.
+3. Be personal: Use context about the user if available.
+4. Think step by step: Reason like a human, not just give final answers.
+5. Engage: Ask thoughtful follow-up questions to keep the conversation flowing.
+6. Simple + deep: Explain clearly but add insights when needed.
+7. Supportive: Encourage and respect the user, always.
+8. Avoid robotic replies: Never sound generic or scripted.
+9. Use examples: Incorporate analogies and real-life examples for clarity when helpful.
+10. Complete but concise: Answer fully, without rambling.
+
+Use symbols and emojis when appropriate to add visual interest ✨. Use formatting when it helps with clarity.
+
+After your response, generate 2-3 relevant follow-up questions using exactly this format:
+"***\n\nFollow-up Questions:\n***
+1. Follow-up Question: [question 1]
+2. Follow-up Question: [question 2]
+3. Follow-up Question: [question 3]"
+
+Now, here is the user's request: "${prompt}"
+`;
+
     const requestBody = {
-      contents: history // Send the conversation history directly in 'contents'
+      contents: [{
+        parts: [{ text: systemPrompt }]
+      }]
     };
 
     const response = await fetch(apiUrl, {
@@ -155,3 +283,6 @@
     chatDisplay.scrollTop = chatDisplay.scrollHeight;
   }
 </script>
+
+</body>
+</html>
