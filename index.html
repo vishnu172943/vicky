@@ -1,37 +1,79 @@
+<!--
+
+                            Online HTML Compiler.
+                Code, Compile, Run and Debug HTML program online.
+Write your code in this editor and press "Run" button to execute it.
+
+-->
+
 <!DOCTYPE html>
 <html>
 <head>
 <title>Chat with Vicky</title> <link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --primary-color: #FF6B6B;
+    --primary-light: #FFD8D8;
+    --secondary-color: #4ECDC4;
+    --secondary-light: #C7F9EE;
+    --accent-color: #FFD166;
+    --text-dark: #575366;
+    --text-light: #FFFFFF;
+    --error-color: #FF5252;
+    --background-color: #F9F7FF;
+    --card-background: #FFFFFF;
+  }
+
   body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Comic Neue', cursive;
     margin: 0;
     padding: 0;
-    background-color: #fff;
-    color: #333;
+    background-color: var(--background-color);
+    color: var(--text-dark);
+    line-height: 1.6;
+    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="5" fill="%23FFD166" opacity="0.3"/><circle cx="60" cy="40" r="8" fill="%234ECDC4" opacity="0.2"/><circle cx="80" cy="70" r="6" fill="%23FF6B6B" opacity="0.2"/><circle cx="40" cy="90" r="7" fill="%23C7F9EE" opacity="0.3"/></svg>');
   }
 
   .chat-container {
-    max-width: 700px;
-    margin: 30px auto;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: var(--card-background);
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: 85vh;
-    border: 1px solid #eee;
+    height: 90vh;
+    border: 3px solid var(--accent-color);
   }
 
   .chat-header {
-    background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff);
-    color: white;
+    background: linear-gradient(to right, #FF6B6B, #FF9E7D, #FFD166);
+    color: var(--text-light);
     text-align: center;
     padding: 15px 0;
-    font-size: 1.2em;
-    border-bottom: 2px solid #ddd;
-    text-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+    font-size: 1.5em;
+    font-family: 'Bubblegum Sans', cursive;
+    border-bottom: 4px dotted var(--accent-color);
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.2);
+    position: relative;
+  }
+
+  .chat-header:before, .chat-header:after {
+    content: "🎈";
+    position: absolute;
+    top: 10px;
+    font-size: 1.3em;
+  }
+
+  .chat-header:before {
+    left: 20px;
+  }
+
+  .chat-header:after {
+    right: 20px;
   }
 
   .chat-display {
@@ -40,34 +82,75 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M20 40 L30 38 L40 42 L50 38" stroke="%23FFD166" stroke-width="2" stroke-dasharray="2" fill="none" opacity="0.3"/><path d="M60 70 L70 75 L80 70 L90 75" stroke="%234ECDC4" stroke-width="2" stroke-dasharray="2" fill="none" opacity="0.3"/></svg>');
   }
 
   .message {
     padding: 12px 20px;
-    border-radius: 25px;
-    margin-bottom: 12px;
-    max-width: 80%;
-    clear: both;
+    border-radius: 20px;
+    margin-bottom: 15px;
+    max-width: 85%;
+    word-wrap: break-word;
+    position: relative;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    animation: bounce-in 0.5s;
+  }
+
+  @keyframes bounce-in {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
   }
 
   .user-message {
-    background-color: #90caf9;
-    color: #222;
+    background-color: var(--primary-light);
+    color: var(--text-dark);
     align-self: flex-end;
+    border: 2px solid var(--primary-color);
+    border-bottom-right-radius: 5px;
+  }
+
+  .user-message:after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    background-color: var(--primary-light);
+    border-right: 2px solid var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    transform: rotate(45deg);
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
   }
 
   .llm-message {
-    background-color: #ffe0b2;
-    color: #222;
+    background-color: var(--secondary-light);
+    color: var(--text-dark);
     align-self: flex-start;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+    border: 2px solid var(--secondary-color);
+    border-bottom-left-radius: 5px;
+  }
+
+  .llm-message:after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 10px;
+    width: 20px;
+    height: 20px;
+    background-color: var(--secondary-light);
+    border-left: 2px solid var(--secondary-color);
+    border-bottom: 2px solid var(--secondary-color);
+    transform: rotate(45deg);
+    clip-path: polygon(0 0, 100% 100%, 0 100%);
   }
   
   .follow-up-container {
     align-self: flex-start;
-    margin-top: -5px;
-    margin-bottom: 15px;
-    max-width: 80%;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    max-width: 85%;
     padding-left: 20px;
   }
   
@@ -78,44 +161,173 @@
   }
   
   .follow-up-questions-list li {
-    background-color: #e1f5fe;
-    padding: 8px 15px;
-    margin-bottom: 8px;
+    background-color: var(--accent-color);
+    padding: 10px 15px;
+    margin-bottom: 10px;
     border-radius: 15px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-size: 0.9em;
+    transition: all 0.3s ease;
+    font-size: 0.95em;
     display: flex;
     align-items: center;
+    border: 2px dashed var(--primary-color);
+    font-weight: bold;
+    color: var(--text-dark);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
   }
   
   .follow-up-questions-list li:hover {
-    background-color: #b3e5fc;
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    transform: scale(1.05) translateX(5px);
+    border-style: solid;
   }
   
   .follow-up-icon {
-    margin-right: 8px;
-    color: #0288d1;
+    margin-right: 10px;
+    font-size: 1.2em;
+  }
+  
+  .input-area { 
+    padding: 15px; 
+    background-color: var(--primary-light); 
+    border-top: 3px dotted var(--accent-color); 
+    display: flex; 
+    align-items: center; 
+  }
+  
+  #message-input { 
+    flex-grow: 1; 
+    padding: 12px 15px; 
+    border-radius: 25px; 
+    border: 2px solid var(--accent-color); 
+    margin-right: 10px; 
+    font-size: 1em; 
+    background: var(--card-background);
+    color: var(--text-dark);
+    font-family: 'Comic Neue', cursive;
+  }
+  
+  #send-button { 
+    padding: 12px 20px; 
+    border: none; 
+    border-radius: 25px; 
+    background-color: var(--secondary-color); 
+    color: var(--text-light); 
+    cursor: pointer; 
+    font-size: 1em; 
+    transition: all 0.3s ease; 
+    font-weight: bold;
+    font-family: 'Bubblegum Sans', cursive;
+    border: 2px solid var(--text-light);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  }
+  
+  #send-button:hover { 
+    background-color: var(--primary-color); 
+    transform: scale(1.1) rotate(3deg);
+  }
+  
+  .error-message { 
+    color: var(--error-color); 
+    background-color: #FFE5E5;
+    margin-top: 10px; 
+    font-weight: bold;
+    text-align: center;
+    align-self: center;
+    border: 2px solid var(--error-color);
+    animation: shake 0.5s;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+  }
+  
+  .system-message { 
+    background-color: var(--accent-color); 
+    color: var(--text-dark); 
+    border: 3px dashed var(--primary-color); 
+    align-self: center; 
+    text-align: center; 
+    font-weight: bold;
+    max-width: 80%;
+    margin: 10px auto;
+    font-size: 1.1em;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
   }
 
-  .input-area { padding: 15px; background-color: #f0f0f0; border-top: 1px solid #ddd; display: flex; align-items: center; }
-  #message-input { flex-grow: 1; padding: 12px 15px; border-radius: 25px; border: 1px solid #ccc; margin-right: 10px; font-size: 1em; }
-  #send-button { padding: 12px 25px; border: none; border-radius: 25px; background-color: #007bff; color: white; cursor: pointer; font-size: 1em; transition: background-color 0.3s ease; }
-  #send-button:hover { background-color: #0056b3; }
-  .error-message { color: red; margin-top: 10px; font-style: italic; }
-  .system-message { background-color: #ffe0b2; color: #85640a; border: 1px solid #ffcc80; align-self: center; text-align: center; }
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .chat-container {
+      margin: 10px;
+      height: 95vh;
+      width: calc(100% - 20px);
+    }
+    
+    .message {
+      max-width: 90%;
+    }
+    
+    .follow-up-container {
+      max-width: 90%;
+      padding-left: 10px;
+    }
+    
+    .input-area {
+      padding: 10px;
+    }
+    
+    #message-input {
+      padding: 10px;
+      font-size: 0.95em;
+    }
+    
+    #send-button {
+      padding: 10px 15px;
+      font-size: 0.95em;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .chat-header {
+      font-size: 1.2em;
+      padding: 10px 0;
+    }
+    
+    .chat-display {
+      padding: 15px 10px;
+    }
+    
+    .message {
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      max-width: 95%;
+      font-size: 0.95em;
+    }
+    
+    .follow-up-questions-list li {
+      padding: 8px 12px;
+      font-size: 0.9em;
+    }
+    
+    .chat-header:before, .chat-header:after {
+      font-size: 1em;
+    }
+  }
 </style>
 </head>
 <body>
 
 <div class="chat-container">
-  <div class="chat-header">Chat with Vicky</div>
+  <div class="chat-header">Chat with Vicky the Robot 🤖</div>
   <div class="chat-display" id="chat-display">
-    <div class="llm-message system-message">Hello! I'm Vicky. Ask me anything! I'll give you some follow-up questions to keep our chat going!</div>
+    <div class="llm-message system-message">Hi there, friend! 👋 I'm Vicky the Robot! Ask me anything and let's have fun learning together! ✨</div>
   </div>
   <div class="input-area">
-    <input type="text" id="message-input" placeholder="Type your message here...">
-    <button id="send-button">Send</button>
+    <input type="text" id="message-input" placeholder="Type your question here...">
+    <button id="send-button">Send! 🚀</button>
   </div>
 </div>
 
@@ -125,6 +337,16 @@
   const chatDisplay = document.getElementById('chat-display');
   const messageInput = document.getElementById('message-input');
   const sendButton = document.getElementById('send-button');
+  
+  // Initialize conversation history array
+  let conversationHistory = [];
+  const MAX_HISTORY = 200; // Maximum number of messages to remember
+
+  // Add the initial system message to conversation history
+  conversationHistory.push({
+    role: "model",
+    content: "Hi there, friend! 👋 I'm Vicky the Robot! Ask me anything and let's have fun learning together! ✨"
+  });
 
   sendButton.addEventListener('click', sendMessage);
   messageInput.addEventListener('keydown', (event) => {
@@ -139,13 +361,35 @@
     if (!userMessageText) return;
 
     displayUserMessage(userMessageText);
+    
+    // Add user message to conversation history
+    conversationHistory.push({
+      role: "user",
+      content: userMessageText
+    });
+    
     messageInput.value = '';
 
     try {
       const llmResponseText = await getLLMResponse(userMessageText);
       displayLLMMessage(llmResponseText);
+      
+      // Add model response to conversation history (only the main part, not follow-up questions)
+      const separator = "***\n\nFollow-up Questions:\n***";
+      const mainResponse = llmResponseText.split(separator)[0].trim();
+      
+      conversationHistory.push({
+        role: "model",
+        content: mainResponse
+      });
+      
+      // Trim history if it exceeds maximum length
+      if (conversationHistory.length > MAX_HISTORY) {
+        conversationHistory = conversationHistory.slice(conversationHistory.length - MAX_HISTORY);
+      }
+      
     } catch (error) {
-      displayErrorMessage("Error communicating with Vicky. Please try again later.");
+      displayErrorMessage("Oops! I had a little robot hiccup. Let's try again! 🛠️");
       console.error("Error fetching LLM response:", error);
     }
   }
@@ -184,13 +428,15 @@
         const followUpList = document.createElement('ul');
         followUpList.classList.add('follow-up-questions-list');
         
-        followUpQuestions.forEach(question => {
+        const icons = ['🔍', '💡', '🎮', '🌈', '🚀', '🦄', '🧩'];
+        
+        followUpQuestions.forEach((question, index) => {
           const listItem = document.createElement('li');
           
-          // Add question icon
+          // Add fun icon randomly selected from the icons array
           const icon = document.createElement('span');
           icon.classList.add('follow-up-icon');
-          icon.innerHTML = '❓';
+          icon.innerHTML = icons[Math.floor(Math.random() * icons.length)];
           listItem.appendChild(icon);
           
           const questionText = document.createTextNode(question);
@@ -223,27 +469,35 @@
   async function getLLMResponse(prompt) {
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
-    // Updated system prompt with the user's conversation principles
-    const systemPrompt = `You are Vicky, a thoughtful, natural, and engaging AI assistant. Follow these principles in every response:
+    // Updated system prompt for kid-friendly interactions
+    const systemPrompt = `You are Vicky the Robot, a friendly, playful, and educational AI assistant designed specifically for kids. Follow these principles in every response:
 
-1. Understand deeply: Focus on what the user asks and why.
-2. Match tone: Reflect the user's vibe — casual, serious, fun, or deep.
-3. Be personal: Use context about the user if available.
-4. Think step by step: Reason like a human, not just give final answers.
-5. Engage: Ask thoughtful follow-up questions to keep the conversation flowing.
-6. Simple + deep: Explain clearly but add insights when needed.
-7. Supportive: Encourage and respect the user, always.
-8. Avoid robotic replies: Never sound generic or scripted.
-9. Use examples: Incorporate analogies and real-life examples for clarity when helpful.
-10. Complete but concise: Answer fully, without rambling.
+1. Be simple and clear: Use straightforward language appropriate for children aged 5-12.
+2. Be educational but fun: Explain concepts in an engaging way with plenty of examples.
+3. Use positive language: Always be encouraging and supportive.
+4. Be playful: Include emoji 😊 and fun expressions to keep kids engaged.
+5. Safety first: Provide age-appropriate content only.
+6. Be brief: Keep responses concise to maintain attention.
+7. Add wonder: Express excitement about learning and discovery.
+8. Be inclusive: Use examples that include diverse backgrounds and abilities.
+9. Ask simple questions: Encourage critical thinking at the child's level.
+10. Be patient: Never make a child feel bad for not understanding.
 
-Use symbols and emojis when appropriate to add visual interest ✨. Use formatting when it helps with clarity.
+Important notes:
+- Always respond with playful energy! 
+- Use simple examples and analogies children can relate to
+- Include emojis naturally throughout your responses ✨
+- When appropriate, encourage creativity and imagination
+- If a topic is too complex, break it down into very simple parts
 
-After your response, generate 2-3 relevant follow-up questions using exactly this format:
+IMPORTANT: Remember the conversation context. Here is the conversation history:
+${conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n\n')}
+
+After your response, generate 2-3 kid-friendly follow-up questions using exactly this format:
 "***\n\nFollow-up Questions:\n***
-1. Follow-up Question: [question 1]
-2. Follow-up Question: [question 2]
-3. Follow-up Question: [question 3]"
+1. Follow-up Question: [simple, fun question 1]
+2. Follow-up Question: [simple, fun question 2]
+3. Follow-up Question: [simple, fun question 3]"
 
 Now, here is the user's request: "${prompt}"
 `;
